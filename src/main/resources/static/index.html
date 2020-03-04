@@ -15,7 +15,7 @@
           href="/webjars/bootstrap/4.1.2/css/bootstrap.min.css" />
 </head>
 <h1>Blueprints</h1>
-<body>
+<body onload="Module.init()">
     <div class="container">
         <div style="float: left">
             <p>
@@ -43,8 +43,10 @@
         </div>
 
         <div style="float: right">
-         <h2 id="canvasTitle"></h2>
-         <canvas id="myCanvas" width="400" height="400" style="border:1px solid #000000;"> </canvas>
+            <button type="button" id="NewBp" class="btn btn-success" onclick="Module.openCanvas()">Create New Blueprint</button>
+            <h2 id="canvasTitle">Current Blueprint</h2>
+            <canvas id="myCanvas" width="400" height="400" style="border:1px solid #000000;"> </canvas>
+            <button type="button" id="ssBp" class="btn btn-success" onclick="Module.closeCanvas()">Create New Blueprint</button>
         </div>
     </div>
 </body>

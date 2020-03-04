@@ -1,14 +1,18 @@
-var api=apiclient;
-var Module=(function (){
+var api = apimock;
+var Module = (function () {
     var _author;
-    function _map(list){
-        return  mapList = list.map(function(blueprint){
-            return {bpname:blueprint.name, numberPoints:blueprint.points.length};
+    var open = false;
+
+    function _map(list) {
+        return mapList = list.map(function (blueprint) {
+            return {bpname: blueprint.name, numberPoints: blueprint.points.length};
         })
     }
 
     function _numberPoints(blueprints) {
-        var total = blueprints.reduce(function(total, value) { return total + value.numberPoints; }, 0);
+        var total = blueprints.reduce(function (total, value) {
+            return total + value.numberPoints;
+        }, 0);
         $("#sumBlueprint > h3").text("Total user points: " + total);
     };
 
@@ -19,17 +23,18 @@ var Module=(function (){
         ctx.clearRect(0, 0, myCanvas.width, myCanvas.height);
         ctx.beginPath();
         var first = blueprints.points[0];
-        ctx.moveTo(first.x,first.y);
-        blueprints.points.map(function(punto){
-            ctx.lineTo(punto.x,punto.y);
+        ctx.moveTo(first.x, first.y);
+        blueprints.points.map(function (punto) {
+            ctx.lineTo(punto.x, punto.y);
         })
         ctx.stroke();
     }
+
     function _table(blueprints) {
         blueprints = _map(blueprints);
         _numberPoints(blueprints);
         $("#tableBlueprints > tbody").empty();
-        blueprints.map(function(blueprint) {
+        blueprints.map(function (blueprint) {
             $("#tableBlueprints > tbody").append(
                 "<tr> <td>" +
                 blueprint.bpname +
@@ -60,13 +65,63 @@ var Module=(function (){
             api.getBlueprintsByAuthor(author, _table);
         }
     };
-    function getBlueprintsAuthorAndName(author,name) {
+
+    function getBlueprintsAuthorAndName(author, name) {
         _setAuthorName(author);
-        api.getBlueprintsByNameAndAuthor(name,author,_graficar);
+        api.getBlueprintsByNameAndAuthor(name, author, _graficar);
     };
+
+    function init() {
+        var canvas = document.getElementById("myCanvas"),
+            context = canvas.getContext("2d");
+        if (window.PointerEvent) {
+            canvas.addEventListener("pointerdown", draw, false);
+        } else {
+            //Provide fallback for user agents that do not support Pointer Events
+            canvas.addEventListener("mousedown", draw, false);
+        }
+    }
+
+    // Event handler called for each pointerdown event:
+    function draw(event) {
+        var canvas = document.getElementById("myCanvas"),
+            context = canvas.getContext("2d");
+        var offset = getOffset(canvas);
+        var x = event.pageX - offset.left;
+        var y = event.pageY - offset.top;
+        console.log(x, y)
+        context.fillRect(x, y, 10, 10);
+    }
+
+    //Helper function to get correct page offset for the Pointer coords
+    function getOffset(obj) {
+        var offsetLeft = 0;
+        var offsetTop = 0;
+        do {
+            if (!isNaN(obj.offsetLeft)) {
+                offsetLeft += obj.offsetLeft;
+            }
+            if (!isNaN(obj.offsetTop)) {
+                offsetTop += obj.offsetTop;
+            }
+        } while (obj = obj.offsetParent);
+        return {left: offsetLeft, top: offsetTop};
+    }
+
+    function openCanvas() {
+        open = true;
+    }
+
+    function closeCanvas() {
+        open = false;
+    }
+
 
     return {
         getBlueprintsAuthor: getBlueprintsAuthor,
         getBlueprintsAuthorAndName: getBlueprintsAuthorAndName,
+        init: init,
+        openCanvas: openCanvas,
+        closeCanvas: closeCanvas
     };
 })();
