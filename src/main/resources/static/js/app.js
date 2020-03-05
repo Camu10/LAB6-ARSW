@@ -1,7 +1,8 @@
-var api = apimock;
+var api = apiclient;
 var Module = (function () {
     var _author;
     var open = false;
+    var currentBlueprint;
 
     function _map(list) {
         return mapList = list.map(function (blueprint) {
@@ -17,7 +18,12 @@ var Module = (function () {
     };
 
     function _graficar(blueprints) {
+        currentBlueprint=blueprints;
+        open=true;
         $("#canvasTitle").text("Current blueprint: " + blueprints.name);
+        redraw(blueprints);
+    }
+    function redraw(blueprints) {
         var myCanvas = document.getElementById("myCanvas");
         var ctx = myCanvas.getContext("2d");
         ctx.clearRect(0, 0, myCanvas.width, myCanvas.height);
@@ -84,13 +90,16 @@ var Module = (function () {
 
     // Event handler called for each pointerdown event:
     function draw(event) {
-        var canvas = document.getElementById("myCanvas"),
-            context = canvas.getContext("2d");
-        var offset = getOffset(canvas);
-        var x = event.pageX - offset.left;
-        var y = event.pageY - offset.top;
-        console.log(x, y)
-        context.fillRect(x, y, 10, 10);
+        if(open){
+            var canvas = document.getElementById("myCanvas"),
+                context = canvas.getContext("2d");
+            var offset = getOffset(canvas);
+            var nx = event.pageX - offset.left;
+            var ny = event.pageY - offset.top;
+            currentBlueprint.points.push({x:nx,y:ny});
+            redraw(currentBlueprint);
+            context.fillRect(nx, ny, 10, 10);
+        }
     }
 
     //Helper function to get correct page offset for the Pointer coords
@@ -108,20 +117,12 @@ var Module = (function () {
         return {left: offsetLeft, top: offsetTop};
     }
 
-    function openCanvas() {
-        open = true;
-    }
 
-    function closeCanvas() {
-        open = false;
-    }
 
 
     return {
         getBlueprintsAuthor: getBlueprintsAuthor,
         getBlueprintsAuthorAndName: getBlueprintsAuthorAndName,
         init: init,
-        openCanvas: openCanvas,
-        closeCanvas: closeCanvas
     };
 })();
